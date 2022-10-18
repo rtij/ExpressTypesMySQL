@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { PostListe, UserListe } from "../Controllers/IndexController";
+import Utilisateur from './Utilisateur';
+import Post from './Post';
 
 const Routes = Router();
-Routes.route('/utilisateur/liste').get(UserListe)
-Routes.route('/post/liste').get(PostListe)
+Routes.use('/utilisateur', Utilisateur);
+Routes.use('/post', Post)
 export default Routes;
