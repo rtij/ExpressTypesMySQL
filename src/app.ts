@@ -5,7 +5,9 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import ErrorMiddleware from '@/middleware/error.middleware';
 import connect from '@/utils/Connect';
-import mysql from 'mysql';
+import Routes from './resources/routes/Routes';
+import { Utilisateur } from './resources/entity/Utilisateur';
+import { Post } from './resources/entity/Post';
 
 
 class App {
@@ -18,17 +20,21 @@ class App {
         this.initialisteDbConnection();
         this.initialiseMiddleware();
         this.initialiseErrorHandling();
+        this.initialiseRoutes();
     }
     
     private initialisteDbConnection(){
-        connect(process.env.DATABASE_URL || '',(error)=>{
+        let database:any = process.env.DATABASE_TYPE;
+        let entity:any = [Utilisateur, Post]
+        connect(database || "mysql", process.env.DATABASE_HOST || 'localhost',Number( process.env.DATABASE_PORT), process.env.DATABASE_USERNAME || 'root', process.env.DATABASE_PASSWORD || '', process.env.DATABASE_NAME || '',entity ,  (error)=>{
             if(error){
                 console.log(error);
+                return false;
             }else{
                 console.log("Connection success");
+                return true;
             }
         });
-        // mysql.createConnection(process.env.DATABASE_URL || '').connect();
     }
 
     private initialiseMiddleware(): void {
@@ -40,6 +46,9 @@ class App {
         this.express.use(compression());
     }
     
+    private initialiseRoutes(){
+        this.express.use('/api', Routes);
+    }
 
     private initialiseErrorHandling(): void {
         this.express.use(ErrorMiddleware)
